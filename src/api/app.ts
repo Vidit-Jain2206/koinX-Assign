@@ -9,5 +9,5 @@ app.use(cors());
 app.use("/api", router);
 
 app.get("/health", (req: Request, res: Response) => {
-  res.send("Server is up and running");
+  res.send("Server is up and running !!!");
 });

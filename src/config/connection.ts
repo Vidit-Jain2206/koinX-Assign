@@ -2,6 +2,7 @@ import { Db, MongoClient } from "mongodb";
 import "dotenv/config";
 let db: Db;
 let url: string = process.env.MONGO_URL || "";
+export const client = new MongoClient(url);
 
 const createIndexs = async () => {
   try {
@@ -18,12 +19,12 @@ const createIndexs = async () => {
   }
 };
 
+// Connect to MongoDB and create index on price_history collection
 export const connectToDb = async (): Promise<void> => {
   try {
     if (url === "") {
       throw new Error("MONGO_URL environment variable is not set");
     }
-    const client = new MongoClient(url);
     await client.connect();
     console.log("Connected to mongoDbAtlas");
     db = client.db("koinXAssignment");
@@ -38,4 +39,13 @@ export const getDb = (): Db => {
     throw new Error("Database not connected!");
   }
   return db;
+};
+
+export const closeDb = async (): Promise<void> => {
+  try {
+    await client.close();
+    console.log("Connection to database closed successfully");
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 };

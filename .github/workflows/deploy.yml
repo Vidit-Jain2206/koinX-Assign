@@ -34,7 +34,7 @@ jobs:
             echo "COIN_GECKO_URL=${{secrets.COIN_GECKO_URL}}" >> .env
             echo "COIN_GECKO_API_KEY=${{secrets.COIN_GECKO_API_KEY}}" >> .env
 
-            npm install
+            npm install && npm run build
 
             pm2 restart koinx-server || pm2 start dist/api/server.js --name "koinx-server"
 

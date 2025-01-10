@@ -53,7 +53,7 @@ The job stores this data in a database for further analysis.
 1. **Clone the repository**:  
    ```bash
    git clone {githubUrl}
-   cd koinX_assignment
+   cd koinX_Assign
    ```
 2. **Install dependencies**:
    ```bash

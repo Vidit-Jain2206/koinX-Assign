@@ -68,7 +68,6 @@ const fetchCoinPriceInInterval = async (
 
   try {
     const { data } = await axios.get(url, options);
-
     if (
       data.prices.length === 0 ||
       data.market_caps.length === 0 ||
@@ -84,21 +83,33 @@ const fetchCoinPriceInInterval = async (
   } catch (error) {}
 };
 
+/*
+  I have used setInterval for maintaining the interval of 2 hours.
+  Let's suppose I run my server at time :- 04:45:89 (hh:mm:s) it will fetch the data for this time and store it in the database.
+  after that next request will go at time :- 06:45:89 (hh:mm:s) and so on.
+
+  if I use node-cron, we will not getting the actual data 
+  let's suppose I run my server at time :- 04:45:89 (hh:mm:s) it will fetch the data for this time and store it in the database.
+  it will activate my cron job at 06:00:00 (hh:mm:s) and so on. so it will fetch the data of 06:00:00 (time) instead of 06:45:89
+
+  So, I have used setInterval for maintaining the interval of 2 hours.
+*/
+
 export const startPriceHistoryScheduler = async () => {
   const now = Date.now();
+  console.log("Running for the first time...", new Date(now));
+  await updatePriceHistory(now);
 
-  cron.schedule("0 */2 * * *", async () => {
+  setInterval(async () => {
     // runs every 2 hours
     try {
-      console.log("Running scheduled price history update...");
-      await updatePriceHistory(Date.now());
+      const time = Date.now();
+      console.log("Running scheduled price history update...", new Date(time));
+      await updatePriceHistory(time);
     } catch (error) {
       console.error("Error running price history update:", error);
     }
-  });
-
-  console.log("Running for the first time...");
-  await updatePriceHistory(now);
+  }, 2 * 60 * 60 * 1000);
 };
 
 const updatePriceHistory = async (now: number) => {
@@ -118,6 +129,7 @@ const updatePriceHistory = async (now: number) => {
     // case:2 -> last updated data is at less or equal than 2 hours
 
     const timeDifference = Math.floor((now - lastExecutionTime) / 1000);
+    console.log(timeDifference);
     if (timeDifference < 2 * 60 * 60) {
       //last fetched data is within 2 hours
       return;

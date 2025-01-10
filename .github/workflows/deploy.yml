@@ -1,0 +1,48 @@
+name: Deploy Node.js App to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Create private key file
+        run: echo "${{ secrets.PRIVATE_KEY }}" > ec2-key.pem
+
+      - name: Set permissions for private key
+        run: chmod 400 ec2-key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem ubuntu@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+            if [ ! -d "/koinX-Assign" ]; then
+              git clone ${{secrets.SERVER_GITHUB_URL}}
+            fi
+
+            cd koinX-Assign
+
+            git pull origin main
+
+            echo "MONGO_URL=${{secrets.MONGO_URL}}" > .env
+            echo "COIN_GECKO_URL=${{secrets.COIN_GECKO_URL}}" >> .env
+            echo "COIN_GECKO_API_KEY=${{secrets.COIN_GECKO_API_KEY}}" >> .env
+
+            npm install
+
+            pm2 restart koinx-server || pm2 start dist/api/server.js --name "koinx-server"
+
+            echo "Deployment completed successfully"
+          EOF
+
+      - name: Cleanup private key
+        run: rm -f ec2-key.pem
+
+      - name: Successful message
+        run: echo "Deployment was successful"

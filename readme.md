@@ -55,21 +55,21 @@ The job stores this data in a database for further analysis.
    git clone {githubUrl}
    cd koinX_assignment
    ```
-2. **Install dependencies
+2. **Install dependencies**:
    ```bash
    npm install 
    ```
-3. **Add env variables
+3. **Add env variables**:
    ```env
     COINGECKO_API_URL=
     COINGECKO_API_KEY=
     DATABASE_URL=
     ```
-4. **Run the application
+4. **Run the application**:
    ```bash
    npm run start
    ```
-5. **Access the apis
+5. **Access the apis**:
    ``` 
     GET /api/v1/stats?coin=bitcoin
     GET /api/v1/deviation?coin=bitcoin
